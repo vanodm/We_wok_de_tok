@@ -82,6 +82,15 @@
     }
   </style>
 </head>
+<!-- Sound Effects -->
+<audio id="meow-sound" src="meow.mp3" preload="auto"></audio>
+<audio id="bg-music" src="bg-music.mp3" preload="auto" loop></audio>
+
+<!-- Mute Button -->
+<button id="sound-toggle" style="position: fixed; top: 20px; right: 20px; z-index: 999;">
+  🔊 Sound
+</button>
+
 <body>
 
   <!-- Floating 🐱 Emojis -->
@@ -104,37 +113,72 @@
     <button onclick="nextMessage()">Next</button>
   </div>
 
-  <script>
+ <script>
   const messages = [
     "Makan roti di atas batu",
     "Sambil minum es kelapa muda",
     "Apakah kamu ada waktu?",
-    "Untuk main geoguesser bersama",
+    "Untuk kita main bersama",
   ];
 
   let index = 0;
   const messageBox = document.getElementById('message');
   const button = document.querySelector('button');
+  const meow = document.getElementById('meow-sound');
+  const music = document.getElementById('bg-music');
+  const soundToggle = document.getElementById('sound-toggle');
   let isTyping = false;
+  let muted = false;
 
+  // Start background music
+  window.addEventListener('load', () => {
+    music.volume = 0.1;
+    music.play().catch(() => {
+      console.log("Click the screen to enable music (browser blocked autoplay)");
+    });
+  });
+
+  // Toggle sound on/off
+  soundToggle.onclick = () => {
+    muted = !muted;
+    if (muted) {
+      music.pause();
+      soundToggle.textContent = "🔇 Muted";
+    } else {
+      music.play();
+      soundToggle.textContent = "🔊 Sound";
+    }
+  };
+
+  // Show next message
   function nextMessage() {
-    if (isTyping) return; // Ignore clicks while typing
-
+    if (isTyping) return;
     if (index < messages.length) {
       typeMessage(messages[index]);
       index++;
     } else {
-      typeMessage("Cihuy");
+      typeMessage("Cihuy🐾");
     }
   }
 
+  // Typing animation and meow sound
   function typeMessage(text) {
     let i = 0;
     messageBox.innerHTML = '';
     isTyping = true;
     button.disabled = true;
-    const speed = 40;
 
+   if (!muted) {
+    for (let j = 0; j < 2; j++) {
+        const meowClone = meow.cloneNode();
+        meowClone.volume = 1.0;
+        meowClone.currentTime = 0;
+        meowClone.play();
+    }
+}
+
+
+    const speed = 40;
     function typeChar() {
       if (i < text.length) {
         messageBox.innerHTML += text.charAt(i);
